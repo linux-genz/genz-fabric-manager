@@ -2,6 +2,7 @@
 import argparse
 import os
 import json
+import requests
 import logging
 
 #https://github.com/FabricAttachedMemory/flask-api-template.git
@@ -11,10 +12,24 @@ from flask_fat import ConfigBuilder
 logging.basicConfig(level=logging.DEBUG)
 
 
-class RCProxy(flask_fat.APIBaseline):
+class FMServer(flask_fat.APIBaseline):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.add_callback = {}
+
+
+def cmd_add(**args):
+    from datetime import datetime
+    url = 'http://localhost:1234/add/add'
+    data = {
+        'timestamp' : datetime.now()
+    }
+    data.update(args)
+    resp = requests.post(url, data)
+    if resp is None:
+        return {}
+    return json.loads(resp.text).get('data', {})
 
 
 def parse_cmd():
@@ -40,7 +55,7 @@ def main(args=None):
     cmd = parse_cmd()
     args.update(cmd)
 
-    mainapp = RCProxy('rcproxy', **args)
+    mainapp = FMServer('FabricManagerServer', **args)
     if args.get('verbose', False):
         for endpoint in mainapp.app.url_map.iter_rules():
             logging.info(endpoint.rule)

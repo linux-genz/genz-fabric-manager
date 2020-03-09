@@ -4,6 +4,6 @@ modules = glob.glob(dirname(__file__)+"/*.py")
 
 __all__ = [ basename(f)[:-3] for f in modules if isfile(f) and not f.startswith('__')]
 
-from . import server
+from . import fm_server
 
-RCProxy = server.RCProxy
+FMServer = fm_server.FMServer
