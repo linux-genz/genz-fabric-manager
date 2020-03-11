@@ -36,10 +36,14 @@ def create_resource():
     resource = body.get('resource', None)
     endpoints = body.get('endpoint', [])
 
+    # If nobody subscribed to this "create" event, then nobody will be notified.
+    # TODO: save the target endpoints that has not subscribed yet and call them
+    # with the shared resource once they subscribe to this event.
     if not mainapp.add_callback:
         msg = { 'error' : 'Nothing happened. There are No subscribers to this event, yet.' }
         return flask.make_response(flask.jsonify(msg), 304)
 
+    # Gets the list of endpoint targets to share resource with.
     endpoints = extract_target_endpoints(endpoints, mainapp.add_callback)
 
     if not mainapp.add_callback:
@@ -88,6 +92,10 @@ def send_resource(resource: dict, endpoints: list):
 
 def extract_target_endpoints(targets, known):
     """
+        There are subscribed endpoints (@known) and there are targets that a user
+    wants to share the resource with. This function gets a "union" of the two and
+    will return only those targets that are in the known state.
+
         @param targets: a list of urls or aliases to get urls from the the subscription list.
         @param known: a subscription dictionary of { 'alias' : 'url' } pair.
     """
@@ -111,7 +119,12 @@ def extract_target_endpoints(targets, known):
 
     return result
 
+
 def get_resource_schema():
+    """
+        The Resource schema that is sent in the body by the resource creator and
+    which is understood by LLamas service.
+    """
     return {
         'gcid': 'number',
         'cclass': 'number', # block storage (non-boot)

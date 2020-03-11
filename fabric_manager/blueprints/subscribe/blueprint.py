@@ -26,6 +26,8 @@ def add_subscribe():
     status = 'nothing'
     code = 200
     body = flask.request.get_json()
+    if not body:
+        body = flask.request.form
 
     callback_endpoint = body.get('callback', None)
     endpoint_alias = body.get('alias', None)
@@ -50,6 +52,7 @@ def add_subscribe():
 
             Journal.mainapp.add_callback[endpoint_alias] = callback_endpoint
 
+        logging.info('resource/add_event: %s' % status)
     response['status'] = status
 
     return flask.make_response(flask.jsonify(response), code)
