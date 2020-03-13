@@ -29,7 +29,7 @@ Add path for all users (need sudo):
 
 ##### If installed using pip3
 
-    python3 fabric_manager -vvvvv
+    python3 -m fabric_manager -vvvvv
     
 ##### If installed from source
 
